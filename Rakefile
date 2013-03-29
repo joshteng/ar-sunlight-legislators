@@ -58,6 +58,7 @@ namespace :import do
   end
 
   task :position do
+    
 
   end
 end
