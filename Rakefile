@@ -4,7 +4,10 @@ require 'rspec/core/rake_task'
 require_relative 'app/models/state'
 require_relative 'app/models/political_party'
 require_relative 'app/models/position'
+require_relative 'app/models/legislator'
 require_relative 'db/config'
+
+$file = "db/data/legislators.csv"
 
 
 desc "create the database"
@@ -62,6 +65,34 @@ namespace :import do
     positions = ['Representative', 'Senator']
     positions.each do |p|
       Position.create(name: p)
+    end
+  end
+
+  task :legislators do
+    Legislator.delete_all
+    csv = CSV.new(File.open($file), headers: true)
+    csv.each do |row|
+      legislator = row.to_hash
+      legislator[:phone_number].gsub!(/\D*/, "") unless legislator[:phone_number].nil?
+      legislator[:fax].gsub!(/\D*/, "") unless legislator[:fax].nil?
+      legislator[:in_office] = legislator[:in_office] == "1" ? true : false
+      legislator_object = Legislator.create(legislator)
+
+      if legislator[:party] == 'D'
+        democrat = PoliticalParty.where('name = ?', 'D').first
+        democrat.legislators<< legislator_object
+      elsif legislator[:party] == 'R'
+        republican = PoliticalParty.where('name = ?', 'R').first
+        republican.legislators<< legislator_object
+      else
+        independent = PoliticalParty.where('name = ?', 'I').first
+        puts independent.class
+        independent.legislators<< legislator_object
+      end
+
+      # puts row.to_hash
+      # 3 associations to take care: political_party, position, state
+
     end
   end
 end
