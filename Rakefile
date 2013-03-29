@@ -3,6 +3,7 @@ require 'rake'
 require 'rspec/core/rake_task'
 require_relative 'app/models/state'
 require_relative 'app/models/political_party'
+require_relative 'app/models/position'
 require_relative 'db/config'
 
 
@@ -58,7 +59,9 @@ namespace :import do
   end
 
   task :position do
-    
-
+    positions = ['Representative', 'Senator']
+    positions.each do |p|
+      Position.create(name: p)
+    end
   end
 end
