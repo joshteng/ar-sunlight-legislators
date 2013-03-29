@@ -9,5 +9,7 @@ class Legislator < ActiveRecord::Base
                   :senate_class, :birthdate
 
    belongs_to :political_party
+   belongs_to :state
+   belongs_to :position
 
 end
